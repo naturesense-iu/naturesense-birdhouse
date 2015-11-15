@@ -8,7 +8,7 @@ SensorArray::SensorArray(Sensor sensors[]){
 }
 
 void SensorArray::start(){
-  for (int i = 0; i < (sizeof(_sensors)/sizeof(*_sensors)); i++)
+  for (unsigned int i = 0; i < (sizeof(_sensors)/sizeof(*_sensors)); i++)
   {
     _sensors[i].start();
     delay(2000);
@@ -19,7 +19,7 @@ void SensorArray::start(){
 String SensorArray::getCSVHeader(){
   String elementHeaders = "";
 
-  for (int i = 0; i < (sizeof(_sensors)/sizeof(*_sensors)); i++)
+  for (unsigned int i = 0; i < (sizeof(_sensors)/sizeof(*_sensors)); i++)
   {
     elementHeaders = _sensors[i].printElementHeadersCSV(elementHeaders);
   }
@@ -30,7 +30,7 @@ String SensorArray::getCSVHeader(){
 String SensorArray::getCSVRow(){
   String elementValues = "";
 
-  for (int i = 0; i < (sizeof(_sensors)/sizeof(*_sensors)); i++)
+  for (unsigned int i = 0; i < (sizeof(_sensors)/sizeof(*_sensors)); i++)
   {
     elementValues = _sensors[i].printElementValuesCSV(elementValues);
   }
@@ -43,7 +43,7 @@ String SensorArray::getCSVRow(){
 String Sensor::printElementHeadersCSV(String inputString) {
   String * elementHeaders = getElementHeaders();
 
-  for (int i = 0; i < (sizeof(elementHeaders)/sizeof(*elementHeaders)); i++)
+  for (unsigned int i = 0; i < (sizeof(elementHeaders)/sizeof(*elementHeaders)); i++)
   {
     if (inputString != "") {
       inputString += ", ";
@@ -57,7 +57,7 @@ String Sensor::printElementHeadersCSV(String inputString) {
 String Sensor::printElementValuesCSV(String inputString) {
   String * elementValues = getElementValues();
 
-  for (int i = 0; i < (sizeof(elementValues)/sizeof(*elementValues)); i++)
+  for (unsigned int i = 0; i < (sizeof(elementValues)/sizeof(*elementValues)); i++)
   {
     if (inputString != "") {
       inputString += ", ";
