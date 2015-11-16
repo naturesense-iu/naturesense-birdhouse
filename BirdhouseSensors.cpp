@@ -2,70 +2,74 @@
 #include "BirdhouseSensors.h" //Broken, needs fixing
 
 //// Sensor Array: The set of all sensors attached to a birdhouse
-
 SensorArray::SensorArray(Sensor sensors[]){
     _sensors = sensors;
 }
 
 void SensorArray::start(){
-  for (unsigned int i = 0; i < (sizeof(_sensors)/sizeof(*_sensors)); i++)
-  {
-    _sensors[i].start();
-    delay(2000);
-  }
-  delay(5000);
+    for (int i = 0; i < (sizeof(_sensors)/sizeof(*_sensors)); i++)
+    {
+        _sensors[i].start();
+        delay(2000);
+    }
+    delay(5000);
 }
 
 String SensorArray::getCSVHeader(){
-  String elementHeaders = "";
+    String elementHeaders = "";
 
-  for (unsigned int i = 0; i < (sizeof(_sensors)/sizeof(*_sensors)); i++)
-  {
-    elementHeaders = _sensors[i].printElementHeadersCSV(elementHeaders);
-  }
-  
-  return elementHeaders;
+    for (int i = 0; i < (sizeof(_sensors)/sizeof(*_sensors)); i++)
+    {
+        elementHeaders = _sensors[i].printElementHeadersCSV(elementHeaders);
+    }
+    
+    return elementHeaders;
 }
 
 String SensorArray::getCSVRow(){
-  String elementValues = "";
+    String elementValues = "";
 
-  for (unsigned int i = 0; i < (sizeof(_sensors)/sizeof(*_sensors)); i++)
-  {
-    elementValues = _sensors[i].printElementValuesCSV(elementValues);
-  }
-  
-  return elementValues;
+    for (int i = 0; i < (sizeof(_sensors)/sizeof(*_sensors)); i++)
+    {
+        elementValues = _sensors[i].printElementValuesCSV(elementValues);
+    }
+    
+    return elementValues;
 }
 
 //// Base class for sensors attached to birdhouses
 
 String Sensor::printElementHeadersCSV(String inputString) {
-  String * elementHeaders = getElementHeaders();
+    std::vector<String> elementHeaders = getElementHeaders();
 
-  for (unsigned int i = 0; i < (sizeof(elementHeaders)/sizeof(*elementHeaders)); i++)
-  {
-    if (inputString != "") {
-      inputString += ", ";
-    } 
-    inputString += elementHeaders[i];
-  }
+    for (int i = 0; i < (elementHeaders.size()); i++)
+    {
+        if (inputString != "") {
+            inputString += ", ";
+        } 
+        inputString += elementHeaders.at(i);
+        // Spark.publish("pEHC.inputString: ", elementHeaders.at(i));
+    }
+    
 
-  return inputString;
+    return inputString;
 }
 
 String Sensor::printElementValuesCSV(String inputString) {
-  String * elementValues = getElementValues();
+    std::vector<String> elementValues = getElementValues();
+//  Spark.publish("pEVC.elementValues: ", elementValues[0]);
 
-  for (unsigned int i = 0; i < (sizeof(elementValues)/sizeof(*elementValues)); i++)
-  {
-    if (inputString != "") {
-      inputString += ", ";
+    for (int i = 0; i < (elementValues.size()); i++)
+    {
+        if (inputString != "") {
+            inputString += ", ";
+        }
+        inputString += elementValues.at(i);
+        // Spark.publish("pEVC.inputString: ", elementValues.at(i);
     }
-    inputString += elementValues[i];
-  }
-  
-  return inputString;
+
+    
+    return inputString;
 }
 
 
@@ -73,28 +77,42 @@ String Sensor::printElementValuesCSV(String inputString) {
 //// Default pins: Interior: 5; Exterior: 6
 
 String TemperatureHumiditySensor::getSensorName() {
-  return _location + " Temperature and Humidity";
+    return _location + " Temperature and Humidity";
 }
-String * TemperatureHumiditySensor::getElementHeaders() {
-    String elements[] = {_location + "Temperature", _location + "Humidity"};
+std::vector<String> TemperatureHumiditySensor::getElementHeaders() {
+    // Spark.publish("GettingSensorHeaders", getSensorName());
+
+    std::vector<String> elements; 
+    elements.push_back(_location + "Temperature");
+    elements.push_back(_location + "Humidity");
+    
     return elements;
 }
-String * TemperatureHumiditySensor::getElementValues(){
+std::vector<String> TemperatureHumiditySensor::getElementValues(){
+    // Spark.publish("GettingSensorValues", getSensorName());
     float temp = _sensor.getTempCelcius();
     float hum = _sensor.getHumidity();
-    
+
     String tempString = String(temp, 3);
     String humString = String(hum, 3);
-    String elements[] = {tempString, humString};
+    
+    // Spark.publish("temp", tempString);
+    // Spark.publish("hum", humString);
+    
+    std::vector<String> elements; 
+    elements.push_back(tempString);
+    elements.push_back(humString);
+    
     return elements;
 }
 void TemperatureHumiditySensor::start(){
+    Spark.publish("StartingSensor", getSensorName());
     _sensor.begin();
 }
-  
+    
 TemperatureHumiditySensor::TemperatureHumiditySensor(uint8_t pin, String location) : _sensor(pin, DHT22){
-    _location = location;
-    _pin = pin;
+        _location = location;
+        _pin = pin;
 };
 
 
@@ -114,21 +132,26 @@ LuminositySensor::LuminositySensor(int32_t id, String location) : _sensor(TSL256
 String LuminositySensor::getSensorName(){
     return _location + " Luminosity";
 }
-String * LuminositySensor::getElementHeaders(){
-    String elements[] = {_location + "Luminosity"};
+std::vector<String> LuminositySensor::getElementHeaders(){
+    std::vector<String> elements; 
+    elements.push_back(_location + "Luminosity");
+
     return elements;
 }
-String * LuminositySensor::getElementValues(){
+std::vector<String> LuminositySensor::getElementValues(){
     sensors_event_t event;
     _sensor.getEvent(&event);
     
     float lum = event.light;
     
     String lumString = String(lum, 3);
-    String elements[] = {lumString};
+    std::vector<String> elements; 
+    elements.push_back(lumString);
+
     return elements;
 }
 void LuminositySensor::start(){
+    Spark.publish("StartingSensor", getSensorName());
     _sensor.enableAutoRange(true);
     _sensor.setIntegrationTime(TSL2561_INTEGRATIONTIME_13MS);
     _sensor.begin();
@@ -153,20 +176,26 @@ bool MotionSensor::readSensor() {
 String MotionSensor::getSensorName(){
     return _location + " Motion";
 }
-String * MotionSensor::getElementHeaders(){
-    String elements[] = {_location + "Motion"};
+std::vector<String> MotionSensor::getElementHeaders(){
+    std::vector<String> elements;
+    elements.push_back(_location + "Motion");
+
     return elements;
 }
-String * MotionSensor::getElementValues(){
+std::vector<String> MotionSensor::getElementValues(){
     bool motionDetected = readSensor();
     String motionDetString = "false";
     if (motionDetected) {
         motionDetString = "true";
     }
-    String elements[] = {motionDetString};
+
+    std::vector<String> elements; 
+    elements.push_back(motionDetString);
+
     return elements;
 }
 void MotionSensor::start(){
+    Spark.publish("StartingSensor", getSensorName());
     pinMode(_pin, INPUT);
 }
 
@@ -197,21 +226,28 @@ float ProximitySensor::calcDistance(float proxRaw) {
 String ProximitySensor::getSensorName(){
     return _location + " Proximity";
 }
-String * ProximitySensor::getElementHeaders(){
-    String elements[] = {_location + "ProximityRaw", _location + "ProximityDistanceCm"};
+std::vector<String> ProximitySensor::getElementHeaders(){
+    std::vector<String> elements;
+    elements.push_back(_location + "ProximityRaw");
+    elements.push_back(_location + "ProximityDistanceCm");
     return elements;
+
 }
-String * ProximitySensor::getElementValues(){
+std::vector<String> ProximitySensor::getElementValues(){
     float proxRaw = readSensor();
     String proxRawString = String(proxRaw, 3);
     
     float proxDistance = calcDistance(proxRaw);
     String proxDistanceString = String(proxDistance, 3);
     
-    String elements[] = {proxRawString, proxDistanceString};
+    std::vector<String> elements; 
+    elements.push_back(proxRawString);
+    elements.push_back(proxDistanceString);
+
     return elements;
 }
 void ProximitySensor::start(){
+    Spark.publish("StartingSensor", getSensorName());
     pinMode(_pin, INPUT);
 }
 
@@ -229,4 +265,3 @@ ExteriorProximitySensor::ExteriorProximitySensor() : ProximitySensor(A2, "Exteri
 
 // SensorArray birdhouseArray(*sensors);
 // int            currentSensor = 0;
-
