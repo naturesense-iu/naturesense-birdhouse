@@ -3,10 +3,10 @@
 InteriorTemperatureHumiditySensor  interiorTemperatureHumiditySensor;   //default pin: 5
 // ExteriorTemperatureHumiditySensor exteriorTemperatureHumiditySensor;    //default pin: 6
 // InteriorLuminositySensor    interiorLuminositySensor;                   //SPI pins
-// InteriorMotionSensor    interiorMotionSensor;                           //default pin: 7
-// ExteriorProximitySensor exteriorProximitySensor;                        //default pin: A2
+InteriorMotionSensor    interiorMotionSensor;                           //default pin: 7
+ExteriorProximitySensor exteriorProximitySensor;                        //default pin: A2
 
-Sensor* sensors[] = {&interiorTemperatureHumiditySensor }; //, &exteriorTemperatureHumiditySensor, &interiorLuminositySensor, &interiorMotionSensor, &exteriorProximitySensor};
+Sensor* sensors[3] = {&interiorTemperatureHumiditySensor, &interiorMotionSensor, &exteriorProximitySensor}; //, &exteriorTemperatureHumiditySensor, &interiorLuminositySensor, &interiorMotionSensor, &exteriorProximitySensor};
 
 SensorArray birdhouseArray(*sensors);
 int            currentSensor = 0;
