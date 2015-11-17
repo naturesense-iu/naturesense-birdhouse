@@ -143,5 +143,4 @@ public:
     ExteriorProximitySensor();
 };
 
-
 #endif
