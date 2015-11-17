@@ -2,12 +2,14 @@
 #include "BirdhouseSensors.h" //Broken, needs fixing
 
 //// Sensor Array: The set of all sensors attached to a birdhouse
-SensorArray::SensorArray(Sensor sensors[]){
+SensorArray::SensorArray(Sensor* sensors){
     _sensors = sensors;
 }
 
 void SensorArray::start(){
-    for (int i = 0; i < (sizeof(_sensors)/sizeof(*_sensors)); i++)
+    int sensorCount = (sizeof(_sensors)/sizeof(*_sensors));
+    Spark.publish("SensorArraySize", String(sensorCount));
+    for (int i = 0; i < sensorCount; i++)
     {
         _sensors[i].start();
         delay(2000);
