@@ -7,10 +7,10 @@
 // #include "Adafruit_Sensor/Adafruit_Sensor.h"
 #include "Adafruit_DHT/Adafruit_DHT.h"
 #include "Adafruit_TSL2561_U/Adafruit_TSL2561_U.h"
-#include<stdlib.h>
+#include <stdlib.h>
 #undef min
 #undef max
-#include<vector>
+#include <vector>
 
 class Sensor {
 public:
@@ -27,10 +27,12 @@ public:
 
 class SensorArray {
 protected:
-    Sensor * _sensors;
+    std::vector<Sensor *> _sensors;
 public:
-    SensorArray(Sensor sensors[]);
-
+    SensorArray(std::vector<Sensor *> sensors);
+    SensorArray();
+    void init(std::vector<Sensor *> sensors);
+    
     void start();
     String getCSVHeader();
     String getCSVRow();
@@ -142,5 +144,29 @@ class ExteriorProximitySensor : public ProximitySensor {
 public:
     ExteriorProximitySensor();
 };
+
+////
+
+class SoundSensor : public Sensor {
+protected:
+    String _location;
+    uint8_t _pin;
+    float readSensor();
+
+public:
+    SoundSensor(uint8_t pin, String location);
+
+    String getSensorName();
+    std::vector<String> getElementHeaders();
+    std::vector<String> getElementValues();
+
+    void start();
+};
+
+class InteriorSoundSensor : public SoundSensor {
+public:
+    InteriorSoundSensor();
+};
+
 
 #endif
