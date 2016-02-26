@@ -20,7 +20,7 @@ public:
 	virtual void start();
 	
 	String printElementValuesCSV(String inputString);
-	
+	String printElementValuesJSON();
 	String printElementHeadersCSV(String inputString);
 };
 
@@ -36,6 +36,7 @@ public:
     void start();
     String getCSVHeader();
     String getCSVRow();
+    String getJSONData();
 };
 
 

@@ -31,17 +31,24 @@ void setup() {
     Serial.println(header);
 
     //publish CSV header
-    Particle.publish("StartingBirdhouse", header);
+    // Particle.publish("StartingBirdhouse", header);
 }
 
 void loop() {
-    delay(2000);
-
-    Serial.println("Monitoring Birdhouse! Iteration: " + currIteration);
-    currIteration++;
-    String currentStatus = birdhouseArray.getCSVRow();
-    Serial.println(currentStatus);
-
-  //publish CSV row
-    Particle.publish("BirdhouseData", currentStatus);
+    // try {
+        delay(2000);
+    
+        Serial.println("Monitoring Birdhouse! Iteration: " + currIteration);
+        currIteration++;
+        // String currentStatus = birdhouseArray.getCSVRow();
+        String currentStatus = birdhouseArray.getJSONData();
+        Serial.println(currentStatus);
+    
+      //publish CSV row
+        Particle.publish("BirdhouseData", currentStatus);
+    // }
+    // catch (const std::exception& e) {
+    //     // Serial.println("Error: " + e);
+    //     delay(240000);
+    // }
 }

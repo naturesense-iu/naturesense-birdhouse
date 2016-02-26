@@ -49,6 +49,21 @@ String SensorArray::getCSVRow(){
     return elementValues;
 }
 
+String SensorArray::getJSONData(){
+    String elementValues = "";
+
+    int sensorCount = _sensors.size();
+
+    elementValues += "{ ";
+    for (int i = 0; i < sensorCount; i++)
+    {
+        elementValues += _sensors.at(i)->printElementValuesJSON();
+    }
+    elementValues += " }";
+    
+    return elementValues;
+}
+
 //// Base class for sensors attached to birdhouses
 
 String Sensor::printElementHeadersCSV(String inputString) {
@@ -84,6 +99,26 @@ String Sensor::printElementValuesCSV(String inputString) {
     return inputString;
 }
 
+String Sensor::printElementValuesJSON() {
+    std::vector<String> elementHeaders = getElementHeaders();
+    std::vector<String> elementValues = getElementValues();
+    String jsonString = "";
+//  Particle.publish("pEVC.elementValues: ", elementValues[0]);
+
+    for (int i = 0; i < (elementValues.size()); i++)
+    {
+        jsonString += "\"";
+        jsonString += elementHeaders.at(i);
+        jsonString += "\":\"";
+        jsonString += elementValues.at(i);
+        jsonString += "\"";
+        jsonString += ", ";
+        // Particle.publish("pEVC.inputString: ", elementValues.at(i);
+    }
+
+    
+    return jsonString;
+}
 
 //// Combined DHT sensor
 //// Default pins: Interior: 5; Exterior: 6
