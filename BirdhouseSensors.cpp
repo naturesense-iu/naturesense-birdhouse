@@ -206,7 +206,7 @@ void LuminositySensor::start(){
 
 InteriorLuminositySensor::InteriorLuminositySensor() : LuminositySensor(725, "Interior") { };
 
-// ExteriorLuminositySensor::ExteriorLuminositySensor() : LuminositySensor(899, "Exterior") { };
+ExteriorLuminositySensor::ExteriorLuminositySensor() : LuminositySensor(899, "Exterior") { };
 
 //// PIR Motion Sensor
 //// Default location: interior, pin 7
@@ -248,7 +248,7 @@ void MotionSensor::start(){
 
 InteriorMotionSensor::InteriorMotionSensor() : MotionSensor(7, "Interior") { };
 
-// ExteriorMotionSensor::ExteriorMotionSensor() : MotionSensor(899, "Exterior") { };
+ExteriorMotionSensor::ExteriorMotionSensor() : MotionSensor(899, "Exterior") { };
 
 
 //// IR Proximity Sensor
@@ -298,7 +298,7 @@ void ProximitySensor::start(){
     pinMode(_pin, INPUT);
 }
 
-// InteriorProximitySensor::InteriorProximitySensor() : ProximitySensor(A0, "Interior") { };
+InteriorProximitySensor::InteriorProximitySensor() : ProximitySensor(A0, "Interior") { };
 
 ExteriorProximitySensor::ExteriorProximitySensor() : ProximitySensor(A1, "Exterior") { };
 
@@ -340,6 +340,55 @@ void SoundSensor::start(){
 InteriorSoundSensor::InteriorSoundSensor() : SoundSensor(A3, "Interior") { };
 
 //ExteriorSoundSensor::ExteriorSoundSensor() : SoundSensor(A4, "Exterior") { };
+
+//// IR Proximity/Luminosity Sensor
+//// Default location: exterior, I2C self-managed: needs to be on I2C pins == D0 => SDA, D1 => SCL
+
+ProxLumSensor::ProxLumSensor(String location) {
+    _location = location;
+}
+
+float ProxLumSensor::readProx() {
+    float proxval = _sensor.readProximity();
+    return proxval;
+}
+float ProxLumSensor::readLum() {
+    float lumval = _sensor.readAmbient();
+    return lumval;
+}
+
+String ProxLumSensor::getSensorName(){
+    return _location + " Proximity-Luminosity";
+}
+std::vector<String> ProxLumSensor::getElementHeaders(){
+    std::vector<String> elements;
+    elements.push_back(_location + "ProximityDistanceCm");
+    elements.push_back(_location + "Luminosity");
+    return elements;
+
+}
+std::vector<String> ProxLumSensor::getElementValues(){
+    float proxDistance = readProx();
+    String proxDistanceString = String(proxDistance, 3);
+
+    float luminosity = readLum();
+    String luminosityString = String(luminosity, 3);
+    
+    std::vector<String> elements; 
+    elements.push_back(proxDistanceString);
+    elements.push_back(luminosityString);
+
+    return elements;
+}
+void ProxLumSensor::start(){
+    Particle.publish("StartingSensor", getSensorName());
+    _sensor.begin();
+}
+
+InteriorProxLumSensor::InteriorProxLumSensor() : ProxLumSensor("Interior") { };
+
+ExteriorProxLumSensor::ExteriorProxLumSensor() : ProxLumSensor("Exterior") { };
+
 
 
 // Setup Example:
